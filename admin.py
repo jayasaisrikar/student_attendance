@@ -163,18 +163,16 @@ def add_timetable():
     
     subject = st.text_input('Subject')
     
-    # Input time (IST)
+    # Input time directly without timezone conversion
     start_time = st.time_input("Start Time", time(0, 0))  # Default to 00:00 (midnight)
     end_time = st.time_input("End Time", time(0, 0))
     
-    # Convert input time to IST timezone
-    start_time_ist = datetime.combine(datetime.today(), start_time).astimezone(ist).time()
-    end_time_ist = datetime.combine(datetime.today(), end_time).astimezone(ist).time()
-    
+    # No need for additional timezone conversion, just store the time directly
     if st.button('Add Timetable'):
         conn = get_db_connection()
         conn.execute("INSERT INTO timetable (subject, start_time, end_time, class_year, day_of_week) VALUES (?, ?, ?, ?, ?)", 
-                     (subject, start_time_ist.strftime("%H:%M"), end_time_ist.strftime("%H:%M"), class_year, day_of_week))
+                     (subject, start_time.strftime("%H:%M"), end_time.strftime("%H:%M"), class_year, day_of_week))
         conn.commit()
         st.success(f'Timetable added for {class_year} on {day_of_week}')
         close_db_connection(conn)
+
