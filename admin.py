@@ -3,10 +3,11 @@ import sqlite3
 import pandas as pd
 import plotly.express as px
 from database import get_db_connection, close_db_connection
-from datetime import datetime
+from datetime import datetime, time
 import pytz
 
 conn = sqlite3.connect('attendance.db')
+ist = pytz.timezone('Asia/Kolkata')
 
 def admin_interface():
     st.title("Admin Interface")
@@ -30,56 +31,34 @@ def manage_timetable():
     st.subheader("Manage Timetable")
     
     conn = get_db_connection()
-    ist = pytz.timezone('Asia/Kolkata')
 
     # Fetch timetable data
     timetable = pd.read_sql_query("SELECT * FROM timetable", conn)
     st.dataframe(timetable)
     
-    
     # Select timetable entry by ID to update or delete
     timetable_id = st.selectbox("Select Timetable ID to Modify", timetable['id'].values)
-    current_time_utc = datetime.now(pytz.utc)
-    current_time_ist = current_time_utc.astimezone(ist)
-    formatted_time_ist = current_time_ist.strftime("%H:%M:%S")
+    
     # Get the selected timetable row
-
-    current_time_ist = datetime.now(ist)
-
-    # Now, set your local time to be equal to current time in IST
-    local_time = current_time_ist
-
-    # Format and display the local time
-    formatted_time = local_time.strftime("%H:%M:%S")
-
-
     selected_timetable = timetable[timetable['id'] == timetable_id].iloc[0]
-    ist = pytz.timezone('Asia/Kolkata')
     
     # Get current time in IST
     current_time_ist = datetime.now(ist)
+    formatted_time_ist = current_time_ist.strftime("%H:%M:%S")
+    st.write(f"**Current Time (IST)**: {formatted_time_ist}")
     
-    # Set local time equal to current time in IST
-    local_time = current_time_ist
-
-    # Format the local time for display
-    formatted_time = local_time.strftime("%H:%M:%S")
-    st.write(f"**Current Time (IST)**: {formatted_time}")
     st.write(f"**Current Subject**: {selected_timetable['subject']}")
     st.write(f"**Current Start Time**: {selected_timetable['start_time']}")
     st.write(f"**Current End Time**: {selected_timetable['end_time']}")
     st.write(f"**Current Day of Week**: {selected_timetable['day_of_week']}")
     st.write(f"**Current Class Year**: {selected_timetable['class_year']}")
     
-    # Prepare the list of days and class years for selection
     days_of_week = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
     class_years = ['I BTech', 'II BTech', 'III BTech', 'IV BTech', 'I MCA', 'II MCA', 'I MTech', 'II MTech']
 
-    # Ensure valid default selection (handle cases where value is not in the list)
     current_day_of_week = selected_timetable['day_of_week'] if selected_timetable['day_of_week'] in days_of_week else days_of_week[0]
     current_class_year = selected_timetable['class_year'] if selected_timetable['class_year'] in class_years else class_years[0]
     
-    # Form to update timetable entry
     with st.form("update_timetable"):
         new_subject = st.text_input("Update Subject", selected_timetable['subject'])
         new_start_time = st.time_input("Update Start Time", pd.to_datetime(selected_timetable['start_time']).time())
@@ -87,7 +66,6 @@ def manage_timetable():
         new_day_of_week = st.selectbox("Update Day of Week", days_of_week, index=days_of_week.index(current_day_of_week))
         new_class_year = st.selectbox("Update Class Year", class_years, index=class_years.index(current_class_year))
         
-        # Submit button to apply changes
         if st.form_submit_button("Update Timetable"):
             conn.execute("""
                 UPDATE timetable 
@@ -98,7 +76,6 @@ def manage_timetable():
             st.success("Timetable updated successfully")
             st.rerun()
     
-    # Option to delete timetable entry
     if st.button("Delete Timetable Entry"):
         try:
             conn.execute("DELETE FROM timetable WHERE id = ?", (timetable_id,))
@@ -175,21 +152,25 @@ def add_timetable():
         ['I BTech', 'II BTech', 'III BTech', 'IV BTech', 'I MCA', 'II MCA', 'I MTech', 'II MTech']
     )
 
-    # New: Select day of the week for timetable entry
     day_of_week = st.selectbox(
         "Select Day of Week", 
         ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
     )
     
     subject = st.text_input('Subject')
-    start_time = st.time_input("Start Time")
-    end_time = st.time_input("End Time")
+    
+    # Input time (IST)
+    start_time = st.time_input("Start Time", datetime.now(ist).time())
+    end_time = st.time_input("End Time", datetime.now(ist).time())
+    
+    # Convert input time to IST timezone
+    start_time_ist = datetime.combine(datetime.today(), start_time).astimezone(ist).time()
+    end_time_ist = datetime.combine(datetime.today(), end_time).astimezone(ist).time()
     
     if st.button('Add Timetable'):
         conn = get_db_connection()
         conn.execute("INSERT INTO timetable (subject, start_time, end_time, class_year, day_of_week) VALUES (?, ?, ?, ?, ?)", 
-                     (subject, start_time.strftime("%H:%M"), end_time.strftime("%H:%M"), class_year, day_of_week))
+                     (subject, start_time_ist.strftime("%H:%M"), end_time_ist.strftime("%H:%M"), class_year, day_of_week))
         conn.commit()
         st.success(f'Timetable added for {class_year} on {day_of_week}')
         close_db_connection(conn)
-
