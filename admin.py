@@ -64,6 +64,7 @@ def manage_timetable():
 
     # Format the local time for display
     formatted_time = local_time.strftime("%H:%M:%S")
+    st.write(f"**Current Time (IST)**: {formatted_time}")
     st.write(f"**Current Subject**: {selected_timetable['subject']}")
     st.write(f"**Current Start Time**: {selected_timetable['start_time']}")
     st.write(f"**Current End Time**: {selected_timetable['end_time']}")
