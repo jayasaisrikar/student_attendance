@@ -4,6 +4,7 @@ import pandas as pd
 import plotly.express as px
 from database import get_db_connection, close_db_connection
 from datetime import datetime
+import pytz
 
 conn = sqlite3.connect('attendance.db')
 
@@ -39,7 +40,9 @@ def manage_timetable():
     
     # Get the selected timetable row
     selected_timetable = timetable[timetable['id'] == timetable_id].iloc[0]
-
+    ist = pytz.timezone('Asia/Kolkata')
+    current_time_ist = datetime.now(ist)
+    formatted_time_ist = current_time_ist.strftime("%H:%M:%S")
     # Display current details of the selected timetable
     current_time = datetime.now()
     formatted_time = current_time.strftime("%H:%M:%S")
