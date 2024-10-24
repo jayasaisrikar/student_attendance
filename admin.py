@@ -160,8 +160,8 @@ def add_timetable():
     subject = st.text_input('Subject')
     
     # Input time (IST)
-    start_time = st.time_input("Start Time", datetime.now(ist).time())
-    end_time = st.time_input("End Time", datetime.now(ist).time())
+    start_time = st.time_input("Start Time", time(0, 0))  # Default to 00:00 (midnight)
+    end_time = st.time_input("End Time", time(0, 0))
     
     # Convert input time to IST timezone
     start_time_ist = datetime.combine(datetime.today(), start_time).astimezone(ist).time()
