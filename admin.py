@@ -66,12 +66,16 @@ def manage_timetable():
         new_day_of_week = st.selectbox("Update Day of Week", days_of_week, index=days_of_week.index(current_day_of_week))
         new_class_year = st.selectbox("Update Class Year", class_years, index=class_years.index(current_class_year))
         
+        # Convert new times to IST timezone
+        new_start_time_ist = datetime.combine(datetime.today(), new_start_time).astimezone(ist).time()
+        new_end_time_ist = datetime.combine(datetime.today(), new_end_time).astimezone(ist).time()
+        
         if st.form_submit_button("Update Timetable"):
             conn.execute("""
                 UPDATE timetable 
                 SET subject = ?, start_time = ?, end_time = ?, class_year = ?, day_of_week = ? 
                 WHERE id = ?
-            """, (new_subject, new_start_time.strftime("%H:%M"), new_end_time.strftime("%H:%M"), new_class_year, new_day_of_week, timetable_id))
+            """, (new_subject, new_start_time_ist.strftime("%H:%M"), new_end_time_ist.strftime("%H:%M"), new_class_year, new_day_of_week, timetable_id))
             conn.commit()
             st.success("Timetable updated successfully")
             st.rerun()
