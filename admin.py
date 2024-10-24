@@ -30,16 +30,22 @@ def manage_timetable():
     st.subheader("Manage Timetable")
     
     conn = get_db_connection()
-    
+    ist = pytz.timezone('Asia/Kolkata')
+
     # Fetch timetable data
     timetable = pd.read_sql_query("SELECT * FROM timetable", conn)
     st.dataframe(timetable)
     
     # Select timetable entry by ID to update or delete
     timetable_id = st.selectbox("Select Timetable ID to Modify", timetable['id'].values)
-    
+    current_time_utc = datetime.now(pytz.utc)
+    current_time_ist = current_time_utc.astimezone(ist)
+    formatted_time_ist = current_time_ist.strftime("%H:%M:%S")
     # Get the selected timetable row
     selected_timetable = timetable[timetable['id'] == timetable_id].iloc[0]
+    st.write("Current UTC Time:", datetime.now(pytz.utc).strftime("%Y-%m-%d %H:%M:%S"))
+    st.write("Current Local Time:", datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+    st.write("Current Time (IST):", formatted_time_ist)
     ist = pytz.timezone('Asia/Kolkata')
     current_time_ist = datetime.now(ist)
     formatted_time_ist = current_time_ist.strftime("%H:%M:%S")
