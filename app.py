@@ -21,7 +21,7 @@ def main():
                 user = login(email, password)
                 if user:
                     st.session_state.user = user
-                    st.experimental_rerun()
+                    st.rerun()
                 else:
                     st.sidebar.error("Invalid email or password")
         else:
@@ -37,7 +37,7 @@ def main():
         if st.sidebar.button("Logout"):
             logout(st.session_state.user['id'])  # Call the logout function
             st.session_state.user = None
-            st.experimental_rerun()
+            st.rerun()
         
         if is_admin(st.session_state.user['email']):
             admin_interface()

@@ -71,7 +71,7 @@ def manage_timetable():
             """, (new_subject, new_start_time.strftime("%H:%M"), new_end_time.strftime("%H:%M"), new_class_year, new_day_of_week, timetable_id))
             conn.commit()
             st.success("Timetable updated successfully")
-            st.experimental_rerun()
+            st.rerun()
     
     # Option to delete timetable entry
     if st.button("Delete Timetable Entry"):
@@ -79,7 +79,7 @@ def manage_timetable():
             conn.execute("DELETE FROM timetable WHERE id = ?", (timetable_id,))
             conn.commit()
             st.success("Timetable entry deleted successfully")
-            st.experimental_rerun()
+            st.rerun()
         except Exception as e:
             st.error(f"Error deleting timetable entry: {e}")
     
@@ -104,7 +104,7 @@ def manage_users():
             conn.execute("UPDATE users SET is_admin = 1 - is_admin WHERE id = ?", (user_id,))
         conn.commit()
         st.success(f"Action '{action}' performed successfully")
-        st.experimental_rerun()
+        st.rerun()
     
     close_db_connection(conn)
 
