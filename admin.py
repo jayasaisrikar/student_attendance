@@ -54,17 +54,16 @@ def manage_timetable():
 
 
     selected_timetable = timetable[timetable['id'] == timetable_id].iloc[0]
-    # st.write("Current UTC Time:", datetime.now(pytz.utc).strftime("%Y-%m-%d %H:%M:%S"))
-    # st.write("Current Local Time:", datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
-    # st.write("Current Time (IST):", formatted_time_ist)
     ist = pytz.timezone('Asia/Kolkata')
+    
+    # Get current time in IST
     current_time_ist = datetime.now(ist)
-    formatted_time_ist = current_time_ist.strftime("%H:%M:%S")
-    # Display current details of the selected timetable
-    current_time = datetime.now()
-    formatted_time = current_time.strftime("%H:%M:%S")
-    #print("Current Time =", formatted_time)
-    st.write(f"**Current Time**: {formatted_time}")
+    
+    # Set local time equal to current time in IST
+    local_time = current_time_ist
+
+    # Format the local time for display
+    formatted_time = local_time.strftime("%H:%M:%S")
     st.write(f"**Current Subject**: {selected_timetable['subject']}")
     st.write(f"**Current Start Time**: {selected_timetable['start_time']}")
     st.write(f"**Current End Time**: {selected_timetable['end_time']}")
