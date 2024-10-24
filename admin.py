@@ -3,6 +3,7 @@ import sqlite3
 import pandas as pd
 import plotly.express as px
 from database import get_db_connection, close_db_connection
+from datetime import datetime
 
 conn = sqlite3.connect('attendance.db')
 
@@ -40,6 +41,10 @@ def manage_timetable():
     selected_timetable = timetable[timetable['id'] == timetable_id].iloc[0]
 
     # Display current details of the selected timetable
+    current_time = datetime.now()
+    formatted_time = current_time.strftime("%H:%M:%S")
+    #print("Current Time =", formatted_time)
+    st.write(f"**Current Time**: {formatted_time}")
     st.write(f"**Current Subject**: {selected_timetable['subject']}")
     st.write(f"**Current Start Time**: {selected_timetable['start_time']}")
     st.write(f"**Current End Time**: {selected_timetable['end_time']}")
